@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from newsapp.models import Article
+from datetime import date
 
 
 class ArticleSerializer(serializers.Serializer):
@@ -31,3 +32,25 @@ class ArticleSerializer(serializers.Serializer):
         instance.active = validated_data.get('active', instance.active)
         instance.save()
         return instance
+
+    def validate(self, data):
+        """Checks that description and title are different"""
+        if data['title'] == data['description']:
+            raise serializers.ValidationError(
+                "Title and description must be different from one another!")
+        else:
+            return data
+
+    def validate_title(self, value):
+        if len(value) < 60:
+            raise serializers.ValidationError(
+                "The title must at least be 60 characters long!")
+        else:
+            return value
+
+    def validate_publication_date(self, value):
+        if value < date.today():
+            raise serializers.ValidationError(
+                'The publication date must be later than today')
+        else:
+            return value
