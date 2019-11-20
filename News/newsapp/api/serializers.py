@@ -1,12 +1,14 @@
 from django.utils.timesince import timesince
 from rest_framework import serializers
-from newsapp.models import Article
+from newsapp.models import Article, Journalist
 from datetime import date, datetime
 
 
 class ArticleSerializer(serializers.ModelSerializer):
 
     time_since_publication = serializers.SerializerMethodField()
+    # author = JournalistSerializer()
+    # author = serializers.StringRelateedField()
 
     class Meta:
         model = Article
@@ -43,6 +45,16 @@ class ArticleSerializer(serializers.ModelSerializer):
                 'The publication date must be later than today!')
         else:
             return value
+
+
+class JournalistSerializer(serializers.ModelSerializer):
+    articles = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name='article-detail')
+    # articles = ArticleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Journalist
+        fields = "__all__"
 
 # class ArticleSerializer(serializers.Serializer):
 #     """Defining the fields that the serializer must have, coming from the model."""
